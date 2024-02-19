@@ -1,14 +1,18 @@
 import Blog from "../model/blog_model";
 import {Response, Request} from 'express'
+import cloudinary from "../utils/cloudinaryConfig";
+import multer from "multer";
+// import multer  from 'multer'
+// const upload = multer({ dest: 'uploads/' })
 
 const  getAllBlogs = async (req: Request , res: Response ) =>{
     try{
-       const post = await Blog.find()
+       const posts = await Blog.find()
     res.status(200).json({
         status: 'Success', 
-        results: post.length,
+        results: posts.length,
         data: {
-            posts: post
+            posts
         }
     })
     }
@@ -23,10 +27,21 @@ const  getAllBlogs = async (req: Request , res: Response ) =>{
 
 const getOneBlog = async (req: Request, res: Response) => {
     try {
-        const post = await Blog.findOne({ _id: req.params.id }) 
+        const post = await Blog.findOne({ _id: req.params.id }).populate('comments', 'comment').exec() 
+        if(!post){
+            res.status(404).json({
+                status: 'Fail',
+                message: 'Blog not found'
+            })
+            return
+        }
+        
         res.status(200).json({
             status: 'Success', 
-            results: post
+            title: post?.title,
+            content: post?.content,
+            likes: post?.likes.length,
+            comments: post?.comments
         })
     } catch (error) {
         res.status(400).json({
@@ -36,25 +51,44 @@ const getOneBlog = async (req: Request, res: Response) => {
     }
 }
 
-
 const createBlog = async (req: Request, res: Response) =>{
     try {
-        const post = new Blog({ 
-            "title": req.body.title, 
-            "content": req.body.content, 
-        }) 
-         await post.save() 
-         res.status(201).json({
-            status: 'Success', 
-            results: {
-                title: req.body.title,
-                content: req.body.content
-            }
-         })
+        if(req.file){
+            cloudinary.uploader.upload(req.file.path, async (err, result) =>{
+                // Create a new post
+                const post = new Blog({ 
+                    "title": req.body.title, 
+                    "image": result?.url,
+                    "content": req.body.content, 
+                    }) 
+                await post.save().then( cb =>{
+                    res.status(201).json({
+                        status: 'Success', 
+                        message: 'Blog Created Successfuly',
+                        data: post
+                    })
+                })
+
+            })
+        } else {
+            const post = new Blog({ 
+                "title": req.body.title, 
+                "content": req.body.content, 
+                }) 
+            await post.save().then( cb =>{
+                res.status(201).json({
+                    id: post._id,
+                    status: 'Success', 
+                    message: 'Blog Created Succesfully',
+                    data: post
+                })
+            })
+        }
+
     } catch (error) {
         res.status(400).json({
             status: 'Failed', 
-            error: 'There was some error creating your blog  ' + error
+            error: 'There was some error creating your blog | ' + error
         })
     }
 }
@@ -74,10 +108,21 @@ const editBlog = async (req: Request, res: Response) =>{
             }
            // post.content = req.body.content 
         } 
+        if(!req.body.content && !req.body.title){
+            res.status(400).json({
+                status: 'Fail',
+                message: 'Pleaase specify the field to update'
+            })
+            return
+        }
         if(post){
             await post.save() 
         }
-        res.send(post) 
+        res.status(200).json({
+            status: 'Successful',
+            message: 'Blog updated successfully',
+            data: post
+        })
     } catch { 
         res.status(404).json({
             status: 'Failed', 
@@ -88,8 +133,13 @@ const editBlog = async (req: Request, res: Response) =>{
 
 const deleteBlog = async (req:Request, res: Response)=>{
     try { 
-        await Blog.deleteOne({ _id: req.params.id }) 
-        res.status(204)
+      const result =   await Blog.deleteOne({ _id: req.params.id }) 
+        if(!result){
+            throw new Error('Post does not exist')
+        }
+        res.status(204).json({
+            status: "Deleted"
+        })
     } catch { 
         res.status(404).json({ 
             status: 'Failed',
