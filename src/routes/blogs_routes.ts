@@ -1,35 +1,13 @@
 import express, {Request, Response, NextFunction} from "express" 
 import {getAllBlogs, getOneBlog, createBlog, editBlog, deleteBlog} from "../controller/blogsController";
+import { adminAuth } from "../middleware/auth.middleware";
+import upload from "../middleware/multer";
+import blogValidator from "../middleware/validateBlog";
     const router = express.Router() 
-interface Post {
-    title: string; 
-    content: string
-}
-    // Get all posts 
-    router.get('/blogs', async (req, res) =>{
-        getAllBlogs(req,res)
-    })
-
-    // Get a Single Blog
-    router.get("/blogs/:id", async (req, res) => { 
-        getOneBlog(req, res)
-     })
-
-    // Create a post
-
-    router.post('/blogs', async(req : Request, res : Response) =>{
-        await createBlog(req, res)
     
-    })
-    // Edit the Blog
-    
-    router.patch("/blogs/:id", async (req, res) => { 
-        editBlog(req,res)
-    })
-
-    // Delete a Blog
-
-    router.delete("/blogs/:id", async (req, res) => { 
-       deleteBlog(req,res)
-    })
+    router.get('/blogs', getAllBlogs)
+          .get("/blogs/:id", getOneBlog)
+          .post('/blogs/new',upload.single('image'),blogValidator, adminAuth, createBlog)
+          .patch("/blogs/edit/:id", adminAuth, editBlog)
+          .delete("/blogs/delete/:id", adminAuth, deleteBlog)
     export default router
