@@ -14,14 +14,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBlog = exports.editBlog = exports.createBlog = exports.getOneBlog = exports.getAllBlogs = void 0;
 const blog_model_1 = __importDefault(require("../model/blog_model"));
+const cloudinaryConfig_1 = __importDefault(require("../utils/cloudinaryConfig"));
+// import multer  from 'multer'
+// const upload = multer({ dest: 'uploads/' })
 const getAllBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const post = yield blog_model_1.default.find();
+        const posts = yield blog_model_1.default.find();
         res.status(200).json({
             status: 'Success',
-            results: post.length,
+            results: posts.length,
             data: {
-                posts: post
+                title: posts
             }
         });
     }
@@ -36,9 +39,18 @@ exports.getAllBlogs = getAllBlogs;
 const getOneBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const post = yield blog_model_1.default.findOne({ _id: req.params.id });
+        if (!post) {
+            res.status(404).json({
+                status: 'Fail',
+                message: 'Blog not found'
+            });
+            return;
+        }
         res.status(200).json({
             status: 'Success',
-            results: post
+            title: post === null || post === void 0 ? void 0 : post.title,
+            content: post === null || post === void 0 ? void 0 : post.content,
+            likes: post === null || post === void 0 ? void 0 : post.likes.length
         });
     }
     catch (error) {
@@ -51,18 +63,27 @@ const getOneBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.getOneBlog = getOneBlog;
 const createBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const post = new blog_model_1.default({
-            "title": req.body.title,
-            "content": req.body.content,
-        });
-        yield post.save();
-        res.status(201).json({
-            status: 'Success',
-            results: {
-                title: req.body.title,
-                content: req.body.content
-            }
-        });
+        if (req.file) {
+            cloudinaryConfig_1.default.uploader.upload(req.file.path, (err, result) => __awaiter(void 0, void 0, void 0, function* () {
+                // Create a new post
+                const post = new blog_model_1.default({
+                    "title": req.body.title,
+                    "image": result === null || result === void 0 ? void 0 : result.url,
+                    "content": req.body.content,
+                });
+                yield post.save().then(cb => {
+                    var _a;
+                    res.status(201).json({
+                        status: 'Success',
+                        results: {
+                            title: req.body.title,
+                            image: (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname,
+                            content: req.body.content,
+                        }
+                    });
+                });
+            }));
+        }
     }
     catch (error) {
         res.status(400).json({
@@ -102,7 +123,9 @@ exports.editBlog = editBlog;
 const deleteBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield blog_model_1.default.deleteOne({ _id: req.params.id });
-        res.status(204);
+        res.status(204).json({
+            status: "Deleted"
+        });
     }
     catch (_b) {
         res.status(404).json({

@@ -10,7 +10,8 @@ const signUpValidator = (signin) => {
         "firstName": joi_1.default.string().min(2).max(12),
         "lastName": joi_1.default.string().min(2).max(12),
         "email": joi_1.default.string().email().required(),
-        "password": joi_1.default.string().min(8).max(16).required()
+        "password": joi_1.default.string().min(8).max(16).required(),
+        "role": joi_1.default.string().optional()
     });
     return userSchema.validate(signin);
 };
