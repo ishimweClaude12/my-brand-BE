@@ -12,6 +12,7 @@ const cors_1 = __importDefault(require("cors"));
 require("dotenv/config");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const comments_routes_1 = __importDefault(require("./routes/comments_routes"));
+//import likeController from './controller/likeController';
 const like_route_1 = __importDefault(require("./routes/like_route"));
 const app = (0, express_1.default)();
 // Use Cors 

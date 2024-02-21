@@ -7,7 +7,7 @@ import cors from 'cors'
 import 'dotenv/config'
 import cookieParser from 'cookie-parser'
 import commentRoutes from './routes/comments_routes';
-import likeController from './controller/likeController';
+//import likeController from './controller/likeController';
 import likeRouter from './routes/like_route';
 
 const app: Express = express()
