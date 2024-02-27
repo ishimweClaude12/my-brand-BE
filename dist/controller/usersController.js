@@ -12,10 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editUser = exports.getUser = exports.deleteUser = exports.login = exports.register = exports.getAllUsers = void 0;
+exports.logOut = exports.editUser = exports.getUser = exports.deleteUser = exports.login = exports.register = exports.getAllUsers = void 0;
 const user_model_1 = __importDefault(require("../model/user_model"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const validation_1 = require("../utils/validation");
 require("dotenv/config");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -38,12 +37,7 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getAllUsers = getAllUsers;
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     try {
-        const userValidatin = (0, validation_1.signUpValidator)(req.body);
-        if (userValidatin.error) {
-            throw new Error(`${(_a = userValidatin.error) === null || _a === void 0 ? void 0 : _a.details[0].message}`);
-        }
         // Destructure variables from the body object passed
         const { firstName, lastName, email, password, role } = req.body;
         const isEmailAlreadyExist = yield user_model_1.default.findOne({
@@ -68,10 +62,6 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
         const token = jsonwebtoken_1.default.sign({ id: user === null || user === void 0 ? void 0 : user._id, email: email }, process.env.JWT_SECRET, { expiresIn: maxAge });
         yield user.save();
-        res.cookie('jwt', token, {
-            httpOnly: true,
-            maxAge: maxAge * 1000, // 3hrs in ms
-        });
         res.status(201).json({
             status: 'Success',
             results: {
@@ -91,13 +81,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
     try {
-        // Validate the email and password
-        const userValidatin = (0, validation_1.signUpValidator)(req.body);
-        if (userValidatin.error) {
-            throw new Error(`${(_b = userValidatin.error) === null || _b === void 0 ? void 0 : _b.details[0].message}`);
-        }
         const { email, password } = req.body;
         const user = yield user_model_1.default.findOne({ email: email });
         if (!user) {
@@ -119,11 +103,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // If the password matches, Create a token
         const maxAge = 3 * 60 * 60;
         const token = jsonwebtoken_1.default.sign({ _id: user === null || user === void 0 ? void 0 : user._id, email: user === null || user === void 0 ? void 0 : user.email, role: user === null || user === void 0 ? void 0 : user.role }, process.env.JWT_SECRET, { expiresIn: maxAge, });
-        res.cookie('jwt', token, {
-            httpOnly: true,
-            maxAge: maxAge * 1000, // 3hrs in ms
-        });
-        res.status(200).json({
+        res.status(200).send({
             status: 'Success',
             message: 'Login Successful',
             token
@@ -198,7 +178,7 @@ const editUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             data: user
         });
     }
-    catch (_c) {
+    catch (_a) {
         res.status(404).json({
             status: 'Failed',
             error: "Such User doesn't Exist, Please use a valid ID"
@@ -206,3 +186,11 @@ const editUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.editUser = editUser;
+const logOut = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.clearCookie('jwt');
+    res.status(200).json({
+        status: 'Success',
+        message: 'Logout Successful'
+    });
+});
+exports.logOut = logOut;

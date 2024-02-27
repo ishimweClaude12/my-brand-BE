@@ -24,7 +24,7 @@ const getAllBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             status: 'Success',
             results: posts.length,
             data: {
-                title: posts
+                posts
             }
         });
     }
@@ -38,7 +38,7 @@ const getAllBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.getAllBlogs = getAllBlogs;
 const getOneBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const post = yield blog_model_1.default.findOne({ _id: req.params.id });
+        const post = yield blog_model_1.default.findOne({ _id: req.params.id }).populate('comments', 'comment').exec();
         if (!post) {
             res.status(404).json({
                 status: 'Fail',
@@ -50,7 +50,8 @@ const getOneBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             status: 'Success',
             title: post === null || post === void 0 ? void 0 : post.title,
             content: post === null || post === void 0 ? void 0 : post.content,
-            likes: post === null || post === void 0 ? void 0 : post.likes.length
+            likes: post === null || post === void 0 ? void 0 : post.likes.length,
+            comments: post === null || post === void 0 ? void 0 : post.comments
         });
     }
     catch (error) {
@@ -84,11 +85,26 @@ const createBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 });
             }));
         }
+        else {
+            const post = new blog_model_1.default({
+                "title": req.body.title,
+                "content": req.body.content,
+            });
+            yield post.save().then(cb => {
+                res.status(201).json({
+                    status: 'Success',
+                    results: {
+                        title: req.body.title,
+                        content: req.body.content,
+                    }
+                });
+            });
+        }
     }
     catch (error) {
         res.status(400).json({
             status: 'Failed',
-            error: 'There was some error creating your blog  ' + error
+            error: 'There was some error creating your blog | ' + error
         });
     }
 });
@@ -107,10 +123,21 @@ const editBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
             // post.content = req.body.content 
         }
+        if (!req.body.content && !req.body.title) {
+            res.status(400).json({
+                status: 'Fail',
+                message: 'Pleaase specify the field to update'
+            });
+            return;
+        }
         if (post) {
             yield post.save();
         }
-        res.send(post);
+        res.status(200).json({
+            status: 'Successful',
+            message: 'Blog updated successfully',
+            data: post
+        });
     }
     catch (_a) {
         res.status(404).json({

@@ -27,7 +27,7 @@ app.use((0, cookie_parser_1.default)());
 mongoose_1.default
     .connect(process.env.DB)
     .then(() => { console.log('DB connected'); })
-    .catch(err => console.log(err));
+    .catch(err => console.log("Can not connect", err));
 const port = process.env.PORT || 3005;
 app.listen(port, function () {
     app.use('/api', blogs_routes_1.default);
@@ -36,3 +36,4 @@ app.listen(port, function () {
     app.use('/api', like_route_1.default);
     console.log('the server is running on port' + `  ${port}`);
 });
+exports.default = app;

@@ -5,7 +5,10 @@ import jwt from 'jsonwebtoken'
 
  const likeController = async(req:Request, res: Response, next: NextFunction) =>{
         const blogId = req.params.id
-        const token = req.cookies.jwt
+        let token:any
+        if(req.headers.authorization){
+              token = req.headers.authorization.split(' ')[1]
+        }
     const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET as string )
     const {_id, email} = decodedToken
         try {

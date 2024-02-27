@@ -26,10 +26,7 @@ const  getAllUsers = async (req: Request , res: Response ) =>{
 
 const register = async (req: Request, res: Response) =>{
     try {
-        const userValidatin = signUpValidator(req.body)
-        if(userValidatin.error){
-            throw new Error(`${userValidatin.error?.details[0].message}`)
-        }
+        
 
         // Destructure variables from the body object passed
         const {firstName, lastName, email, password, role} = req.body  
@@ -57,10 +54,6 @@ const register = async (req: Request, res: Response) =>{
         const token = jwt.sign({ id: user?._id, email: email}, process.env.JWT_SECRET as string, {expiresIn: maxAge} )
 
          await user.save()
-         res.cookie('jwt',token,  {
-            httpOnly: true,
-            maxAge: maxAge * 1000, // 3hrs in ms
-          } )
          res.status(201).json({
             status: 'Success', 
             results: {
@@ -80,11 +73,7 @@ const register = async (req: Request, res: Response) =>{
 
 const login = async (req: Request, res: Response) =>{
     try {
-        // Validate the email and password
-        const userValidatin = signUpValidator(req.body)
-        if(userValidatin.error){
-            throw new Error(`${userValidatin.error?.details[0].message}`)
-        }
+        
         const {email, password} = req.body
         const user = await User.findOne({ email: email})
         if(!user){
@@ -109,11 +98,9 @@ const login = async (req: Request, res: Response) =>{
         // If the password matches, Create a token
         const maxAge = 3 * 60 * 60;
         const token = jwt.sign({_id: user?._id, email: user?.email, role: user?.role}, process.env.JWT_SECRET as string,   {expiresIn: maxAge,})
-        res.cookie('jwt',token,  {
-            httpOnly: true,
-            maxAge: maxAge * 1000, // 3hrs in ms
-          } )
-        res.status(200).json({
+       
+          
+        res.status(200).send({
             status: 'Success',
             message: 'Login Successful',
             token
@@ -195,4 +182,12 @@ const editUser = async (req: Request, res: Response) =>{
         })
     } 
 }
-export {getAllUsers, register, login, deleteUser , getUser , editUser}
+
+const logOut = async(req: Request, res: Response) =>{
+    res.clearCookie('jwt')
+    res.status(200).json({
+        status: 'Success', 
+        message: 'Logout Successful'
+    })
+}
+export {getAllUsers, register, login, deleteUser , getUser , editUser, logOut}

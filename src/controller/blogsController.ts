@@ -12,8 +12,7 @@ const  getAllBlogs = async (req: Request , res: Response ) =>{
         status: 'Success', 
         results: posts.length,
         data: {
-            title: posts
-
+            posts
         }
     })
     }
@@ -28,7 +27,7 @@ const  getAllBlogs = async (req: Request , res: Response ) =>{
 
 const getOneBlog = async (req: Request, res: Response) => {
     try {
-        const post = await Blog.findOne({ _id: req.params.id }) 
+        const post = await Blog.findOne({ _id: req.params.id }).populate('comments', 'comment').exec() 
         if(!post){
             res.status(404).json({
                 status: 'Fail',
@@ -41,7 +40,8 @@ const getOneBlog = async (req: Request, res: Response) => {
             status: 'Success', 
             title: post?.title,
             content: post?.content,
-            likes: post?.likes.length
+            likes: post?.likes.length,
+            comments: post?.comments
         })
     } catch (error) {
         res.status(400).json({
@@ -64,21 +64,31 @@ const createBlog = async (req: Request, res: Response) =>{
                 await post.save().then( cb =>{
                     res.status(201).json({
                         status: 'Success', 
-                        results: {
-                            title: req.body.title,
-                            image: req.file?.originalname,
-                            content: req.body.content,
-                        }
+                        message: 'Blog Created Successfuly',
+                        data: post
                     })
                 })
 
+            })
+        } else {
+            const post = new Blog({ 
+                "title": req.body.title, 
+                "content": req.body.content, 
+                }) 
+            await post.save().then( cb =>{
+                res.status(201).json({
+                    id: post._id,
+                    status: 'Success', 
+                    message: 'Blog Created Succesfully',
+                    data: post
+                })
             })
         }
 
     } catch (error) {
         res.status(400).json({
             status: 'Failed', 
-            error: 'There was some error creating your blog  ' + error
+            error: 'There was some error creating your blog | ' + error
         })
     }
 }
@@ -98,10 +108,21 @@ const editBlog = async (req: Request, res: Response) =>{
             }
            // post.content = req.body.content 
         } 
+        if(!req.body.content && !req.body.title){
+            res.status(400).json({
+                status: 'Fail',
+                message: 'Pleaase specify the field to update'
+            })
+            return
+        }
         if(post){
             await post.save() 
         }
-        res.send(post) 
+        res.status(200).json({
+            status: 'Successful',
+            message: 'Blog updated successfully',
+            data: post
+        })
     } catch { 
         res.status(404).json({
             status: 'Failed', 
@@ -112,7 +133,10 @@ const editBlog = async (req: Request, res: Response) =>{
 
 const deleteBlog = async (req:Request, res: Response)=>{
     try { 
-        await Blog.deleteOne({ _id: req.params.id }) 
+      const result =   await Blog.deleteOne({ _id: req.params.id }) 
+        if(!result){
+            throw new Error('Post does not exist')
+        }
         res.status(204).json({
             status: "Deleted"
         })

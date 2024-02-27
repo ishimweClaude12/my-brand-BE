@@ -72,6 +72,9 @@ const deleteComment = async (req: Request, res: Response) =>{
 const editComment = async (req: Request, res: Response) =>{
     const commentId = req.params.id 
     const content = req.body.comment
+    if(!content){
+        throw new Error('Please add a new comment')
+    }
     try {
         await Comment.findOneAndUpdate({_id: commentId}, {comment: content}).then(c =>{
             res.status(200).json({

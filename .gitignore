@@ -128,3 +128,11 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# My ignores 
+.env
+dir
+/dist
+node_modules
+coverage
+/uploads

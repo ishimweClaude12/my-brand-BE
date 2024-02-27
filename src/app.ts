@@ -27,7 +27,7 @@ app.use(cookieParser())
 mongoose
 .connect(process.env.DB as string)
 .then(()=>{console.log('DB connected')})
-.catch(err => console.log(err))
+.catch(err => console.log("Can not connect",err))
 
  const port = process.env.PORT || 3005
  app.listen(port, function(){
@@ -38,3 +38,5 @@ mongoose
     app.use('/api', likeRouter)
     console.log('the server is running on port'+ `  ${port}`);
 })
+
+export default app

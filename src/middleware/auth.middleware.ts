@@ -2,14 +2,17 @@ import {Request, Response, NextFunction} from 'express'
 import User from '../model/user_model'
 import jwt from 'jsonwebtoken'
 import 'dotenv/config'
+import { userInfo } from 'os'
 
 
 
 const userAuth = async (req: Request, res: Response, next: NextFunction) =>{
    
     try {
-        const token = req.cookies.jwt
-        
+        let token:any
+        if(req.headers.authorization){
+              token = req.headers.authorization.split(' ')[1]    
+        }       
         if(!token){
             throw new Error('Please login to access this route')
         }
@@ -36,8 +39,10 @@ const userAuth = async (req: Request, res: Response, next: NextFunction) =>{
 const adminAuth = async (req: Request, res: Response, next: NextFunction) =>{
    
     try {
-        const token = req.cookies.jwt
-        
+        let token:any
+        if(req.headers.authorization){
+              token = req.headers.authorization.split(' ')[1]    
+        }
         if(!token){
             throw new Error('Please login to access this route')
         }
@@ -52,11 +57,12 @@ const adminAuth = async (req: Request, res: Response, next: NextFunction) =>{
         if(role !== 'Admin'){
             throw new Error('You are not authorized | You have to be an Admin')
         }
+        
         next()
     } catch (error: any) {
         res.status(400).json({
             status: 'Fail', 
-            error: 'Something went wrong  |' + error?.message
+            error: 'Something went wrong  | ' + error?.message
         })
     }
 }
