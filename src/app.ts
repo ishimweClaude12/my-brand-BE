@@ -9,6 +9,8 @@ import cookieParser from 'cookie-parser'
 import commentRoutes from './routes/comments_routes';
 //import likeController from './controller/likeController';
 import likeRouter from './routes/like_route';
+import swaggerUI from 'swagger-ui-express'
+import docs from './../swagger.json'
 
 const app: Express = express()
 // Use Cors 
@@ -36,6 +38,7 @@ mongoose
     app.use('/api', usersRouter)
     app.use('/api', commentRoutes)
     app.use('/api', likeRouter)
+    app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(docs))
     console.log('the server is running on port'+ `  ${port}`);
 })
 

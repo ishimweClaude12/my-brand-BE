@@ -30,6 +30,7 @@ let token: any
       // role: "Admin"
     }
     let singlePost: any;
+    let comment: any;
   describe('Testing API', () => {
     
     it('Basic user Logging in', async () =>{
@@ -97,6 +98,35 @@ let token: any
     .set( "authorization", 'bearer ' + token)
     expect(response.body.status).toBe('Success')
     })
+
+
+    it('Adding a comment on a blog', async ()=>{
+      const Admin =  await supertest(app).post('/api/users/login').send(testUser).set('email', testUser.email).set('password', testUser.password); 
+      const token = Admin.body.token
+      const res = await supertest(app)
+                  .post(`/api/blogs/${singlePost.id}/comments`)
+                  .set( "authorization", 'bearer ' + token)
+                  .send({comment: "This is the test comment"})
+                  .set('email', testUser.email)
+                  .set('password', testUser.password)
+              comment = res.body.data.id    
+          expect(res.body.status).toBe('Success')
+    })
+    it('Getting all comments on a blog', async () =>{
+      const response = await supertest(app).get(`/api/blogs/${singlePost.id}/comments`)
+      expect(response.body.status).toContain('Success');
+    })
+    it('Deleting a comment', async () =>{
+      const userLogin =  await supertest(app).post('/api/users/login').send(testUser).set('email', testUser.email).set('password', testUser.password); 
+      const token = userLogin.body.token
+      const res = await supertest(app)
+                  .delete(`/api/blogs/${comment}/comments`)
+                  .set( "authorization", 'bearer ' + token)
+                  .set('email', testUser.email)
+                  .set('password', testUser.password)
+      expect(res.body.status).toBe('Success')
+    })
+    
     })
 
 
