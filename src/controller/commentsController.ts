@@ -8,7 +8,10 @@ import Comment from "../model/comment_model"
 
 const createComment = async (req: Request, res: Response) =>{
     const blogId = req.params.id
-    const token = req.cookies.jwt
+    let token:any
+        if(req.headers.authorization){
+              token = req.headers.authorization.split(' ')[1]    
+        }
     const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET as string )
     const {_id, email} = decodedToken
     const comment = new Comment({
@@ -24,7 +27,10 @@ const createComment = async (req: Request, res: Response) =>{
             res.status(201).json({
                 status: 'Success', 
                 message: 'Comment Created Successfully', 
-                data: comment
+                data: {
+                    id: comment._id, 
+                    comment
+                }
             })
         })
         

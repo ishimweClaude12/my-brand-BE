@@ -1,0 +1,1010 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "description": "A humble blogs sharing and learning app for everyone",
+    "title": "Capstone Project Backend API"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3005",
+      "description": "Local server"
+    }
+  ],
+
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "To authenticate, include a valid JWT token in the Authorization header using the Bearer scheme. Contact the API administrator to obtain a token."
+      }
+    },
+    "responses": {
+      "NotFound": {
+        "description": "The specified resource was not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Resource not found"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Bad Request"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Access token is missing or invalid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Forbidden"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ConflictError": {
+        "description": "Resource exists",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Resource exists"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Validation error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Validation error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "UserSignup": {
+        "required": ["userName", "email", "type", "password"],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "username",
+            "example": "Jason Tatum"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email",
+            "example": "example@aol.com"
+          },
+          
+          "password": {
+            "type": "string",
+            "description": "Password",
+            "example": "Password1234??"
+          }
+        }
+      },
+      "UserLogin": {
+        "required": ["email", "password"],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "your email",
+            "example": "example1@email.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "your password",
+            "example": "password123??"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User Endpoints"
+    }
+  ],
+  "schemes": ["http", "https"],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+
+  "paths": {
+    "/auth/create": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User signup",
+        "description": "Creat user account",
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSignup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully!"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "description": "User login",
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "You logged in successfully!"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+
+    "/level/add": {
+      "post": {
+        "tags": ["Levels"],
+        "summary": "Level ",
+        "description": "Level",
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Level"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Level created successfully!"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/level": {
+      "get": {
+        "tags": ["Levels"],
+        "summary": "Level ",
+        "description": "Get all levels",
+        "responses": {
+          "200": {
+            "description": "Level retrieved successfully!"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/school/add": {
+      "post": {
+        "tags": ["Schools"],
+        "summary": "Create School",
+        "description": "Creat School account",
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/School"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "School created successfully!"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/school": {
+      "get": {
+        "tags": ["Schools"],
+        "summary": "all schools",
+        "description": "Find all schools",
+        "responses": {
+          "200": {
+            "description": "School retrieved successfully!"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/school/{id}": {
+      "get": {
+        "tags": ["Schools"],
+        "summary": "School by id",
+        "description": "reset lost password by sending email",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "School Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "School retrieved successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/class/add": {
+      "post": {
+        "tags": ["Classes"],
+        "summary": "Create class",
+        "description": "Create callss",
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Class"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "class created successfully!"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/class": {
+      "get": {
+        "tags": ["Classes"],
+        "summary": "All cllasses",
+        "description": "Get all callss",
+        "responses": {
+          "200": {
+            "description": "class retrieved successfully!"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/class/{id}": {
+      "get": {
+        "tags": ["Classes"],
+        "summary": "Class by id",
+        "description": "Get single class by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Class Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Class retrieved successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/student/add": {
+      "post": {
+        "tags": ["Students"],
+        "summary": "Create student",
+        "description": "Create student",
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Student"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Student created successfully!"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/student": {
+      "get": {
+        "tags": ["Students"],
+        "summary": "all Students",
+        "description": "Find all Students",
+        "responses": {
+          "200": {
+            "description": "students retrieved successfully!"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/student/{id}": {
+      "get": {
+        "tags": ["Students"],
+        "summary": "Student by id",
+        "description": "Get single student by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "SChool Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Student retrieved successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/enrollement/add": {
+      "post": {
+        "tags": ["Enrollments"],
+        "summary": "Create enrollment",
+        "description": "Create enrollment",
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Enrollment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Enrollment created successfully!"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/enrollement/": {
+      "get": {
+        "tags": ["Enrollments"],
+        "summary": "Gete enrollments",
+        "description": "Get all enrollments",
+        "responses": {
+          "200": {
+            "description": "Enrollment retrieved successfully!"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/enrollement": {
+      "delete": {
+        "tags": ["Enrollments"],
+        "summary": "Delete All enrollment.",
+        "description": "Delete All enrollment.",
+
+        "responses": {
+          "200": {
+            "description": "Enrollment deleted successfully."
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/enrollement/{id}": {
+      "get": {
+        "tags": ["Enrollments"],
+        "summary": "Get enrollment by id",
+        "description": "Get enrollment by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Enrollment Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enrollment retrieved successfully."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/enrollement/{Id}": {
+      "patch": {
+        "tags": ["Enrollments"],
+        "summary": "Update enrollment.",
+        "description": "Update enrollment.",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Enrollment Id"
+          }
+        ],
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/updateEnrollment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enrollment updated successfully."
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/enrollement/{ID}": {
+      "delete": {
+        "tags": ["Enrollments"],
+        "summary": "Delete enrollment.",
+        "description": "Delete enrollment.",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Enrollment Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enrollment deleted successfully."
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/term/": {
+      "get": {
+        "tags": ["School Terms"],
+        "summary": "Get all school terms",
+        "description": "Get all School term.",
+        "responses": {
+          "200": {
+            "description": "Terms retrieved successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/term/add": {
+      "post": {
+        "tags": ["School Terms"],
+        "summary": "Create  term",
+        "description": "Create School term",
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchoolTerm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "School term created successfully!"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/term/{id}": {
+      "get": {
+        "tags": ["School Terms"],
+        "summary": "Get term by id",
+        "description": "Get School term By ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Term Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Term retrieved successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/term/{Id}": {
+      "put": {
+        "tags": ["School Terms"],
+        "summary": "Update  term",
+        "description": "Update School term",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Term Id"
+          }
+        ],
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchoolTerm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "School term updated successfully!"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/term/{ID}": {
+      "delete": {
+        "tags": ["School Terms"],
+        "summary": "Delet  term",
+        "description": "Delete School term",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Term Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "School term deleted successfully!"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/requirementFee/": {
+      "get": {
+        "tags": ["Requirements"],
+        "summary": "Get  term requirements",
+        "description": "Get all term requirements",
+        "responses": {
+          "200": {
+            "description": "term requirements retrieved successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/requirementFee/{id}": {
+      "get": {
+        "tags": ["Requirements"],
+        "summary": "Get Requirements",
+        "description": "Get term requirement based on id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Requirement Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Requirement retrieved successfully!"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/requirementFee/add": {
+      "post": {
+        "tags": ["Requirements"],
+        "summary": "Create requirements",
+        "description": "Crete term requirements",
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Requirements"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Requirements is created successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/requirementFee/{Id}": {
+      "put": {
+        "tags": ["Requirements"],
+        "summary": "Update requirements",
+        "description": "Update term requirements",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Requirement Id"
+          }
+        ],
+        "requestBody": {
+          "required": "true",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Requirements"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Requirements is updated successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/requirementFee/{ID}": {
+      "delete": {
+        "tags": ["Requirements"],
+        "summary": "Delete requirements",
+        "description": "Delete term requirements",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Requirement Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Requirements is deleted successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    }
+  }
+}
