@@ -83,15 +83,18 @@ let token: any
 
 
   it('Deleting a single blog that does not exist will give 401', async () =>{
-    
+    const Admin =  await supertest(app).post('/api/users/login').send(testAdmin).set('email', testAdmin.email).set('password', testAdmin.password); 
+      const token = Admin.body.token
     const res = await supertest(app).delete(`/api/blogs/${singlePost.id}`)
     .set( "authorization", 'bearer ' + token)
-    expect(res.body.status).toBe(undefined)
+    .set('email', testAdmin.email)
+      .set('password', testAdmin.password);
+    expect(res.statusCode).toBe(204)
   })
     
 
     it('Test how to get all the users of the system',async ()=>{
-      const res = await supertest(app).delete(`/api/blogs/${singlePost.title}`)
+      //const res = await supertest(app).delete(`/api/blogs/${singlePost.title}`)
     
     const response = await supertest(app)
     .get('/api/users')
@@ -127,6 +130,27 @@ let token: any
       expect(res.body.status).toBe('Success')
     })
     
+    it('Editing a comment ', async () =>{
+      const userLogin =  await supertest(app).post('/api/users/login').send(testUser).set('email', testUser.email).set('password', testUser.password); 
+      const token = userLogin.body.token
+      const res = await supertest(app)
+                  .patch(`/api/blogs/${comment}/comments`)
+                  .send({ comment: 'This is the new and revamped comment'})
+                  .set( "authorization", 'bearer ' + token)
+                  .set('email', testUser.email)
+                  .set('password', testUser.password)
+      expect(res.body.status).toBe('Success')
+    })
+    it('Liking a blog', async ()=>{
+      const userLogin =  await supertest(app).post('/api/users/login').send(testUser).set('email', testUser.email).set('password', testUser.password); 
+      const token = userLogin.body.token
+      const res = await supertest(app)
+                  .patch(`/api/blogs/${singlePost.id}/like`)
+                  .set( "authorization", 'bearer ' + token)
+                  .set('email', testUser.email)
+                  .set('password', testUser.password)
+                expect(res.body.status).toBe('Success')
+    })
     })
 
 
