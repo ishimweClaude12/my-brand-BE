@@ -27,9 +27,9 @@ app.use(cookieParser())
     // Connect to MongoDB database
 
 mongoose
-.connect(process.env.DB as string)
+.connect(process.env.ATLAS as string)
 .then(()=>{console.log('DB connected')})
-.catch(err => console.log("Can not connect",err))
+.catch(err => console.log("Can not connect",err.message))
 
  const port = process.env.PORT || 3005
  app.listen(port, function(){
