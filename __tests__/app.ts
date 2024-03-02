@@ -6,7 +6,7 @@ import app from '../src/app'
 import dotenv from 'dotenv';
 dotenv.config();
 
-const DB_URL = process.env.DB 
+const DB_URL = process.env.ATLAS 
 
 beforeAll(async () => {
     await mongoose.connect(`${DB_URL}`);
