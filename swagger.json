@@ -11,7 +11,7 @@
         "description": "Local server"
       },
       {
-        "url": "https://my-brand-be-ddpa.onrender.com",
+        "url": "https://my-brand-be-ddpa.onrender.com/api",
         "description": "hosted server"
       }
     ],
