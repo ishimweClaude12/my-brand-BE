@@ -11,6 +11,8 @@ import commentRoutes from './routes/comments_routes';
 import likeRouter from './routes/like_route';
 import swaggerUI from 'swagger-ui-express'
 import docs from './../swagger.json'
+import errorVerseRouter from './routes/errorVerseRoute';
+import errorVerse from './controller/404';
 
 const app: Express = express()
 // Use Cors 
@@ -38,6 +40,7 @@ mongoose
     app.use('/api', usersRouter)
     app.use('/api', commentRoutes)
     app.use('/api', likeRouter)
+    app.get('/api/*', errorVerse)
     app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(docs))
     console.log('the server is running on port'+ `  ${port}`);
 })

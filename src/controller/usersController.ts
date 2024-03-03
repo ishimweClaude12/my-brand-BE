@@ -171,7 +171,7 @@ const editUser = async (req: Request, res: Response) =>{
         if(user)
         await user.save() 
       
-        res.status(200).json({
+        res.status(201).json({
             status: 'Success',
             data: user
         }) 

@@ -7,7 +7,7 @@ import blogValidator from "../middleware/validateBlog";
     
     router.get('/blogs', getAllBlogs)
           .get("/blogs/:id", getOneBlog)
-          .post('/blogs',upload.single('image'),blogValidator, adminAuth, createBlog)
-          .patch("/blogs/:id", adminAuth, editBlog)
-          .delete("/blogs/:id", adminAuth, deleteBlog)
+          .post('/blogs/new',upload.single('image'),blogValidator, adminAuth, createBlog)
+          .patch("/blogs/edit/:id", adminAuth, editBlog)
+          .delete("/blogs/delete/:id", adminAuth, deleteBlog)
     export default router
