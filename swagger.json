@@ -189,14 +189,25 @@
               "example": "Amazing blog"
             },
             "url": {
-              "type": "string",
-              "description": "Image link",
-              "example": "https://cloudinary.com/dkfjrjei/wieeri"
+              "type": "file",
+              "description": "Image link"
+            
             },
             "content": {
               "type": "string",
               "description": "Content",
               "example": "Content of the blog"
+            }
+          }
+        },
+        "Comment": {
+          "required": ["comment"],
+          "type": "object",
+          "properties": {
+            "comment": {
+              "type": "string",
+              "description": "Comment",
+              "example": "Content of the comment"
             }
           }
         }
@@ -214,6 +225,14 @@
       {
         "name": "Blog",
         "description": "Blog actions"
+      },
+      {
+        "name": "Comments",
+        "description":"Commenting actions"
+      },
+      {
+        "name": "Like",
+        "description":"Liking a comment actions"
       }
     ],
     "schemes": ["http", "https"],
@@ -292,7 +311,7 @@
           "description": "Find all users in the system.",
           "responses": {
             "200": {
-              "description": "School retrieved successfully!"
+              "description": "Users retrieved successfully!"
             },
             "500": {
               "$ref": "#/components/responses/ServerError"
@@ -399,6 +418,324 @@
             },
             "409": {
               "$ref": "#/components/responses/ConflictError"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            }
+          }
+        }
+      },
+
+      "/blogs/{id}":{
+        "get": {
+          "tags": ["Blog"],
+          "summary": "Get A Single Blog ",
+          "description": "Pass in an ID of the blog to get it",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "default": "65d1d9379f46680630b65fd0"
+              },
+              "description": "Blog ID"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Blog found."
+            },
+            "400": {
+              "$ref": "#/components/responses/BadRequest"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            }
+          }
+        }
+      },
+      "/blogs/new": {
+        "post": {
+          "tags": ["Blog"],
+          "summary": "Create a Blog",
+          "description": "Keep in mind that only an Admin can create a blog",
+          "requestBody": {
+            "required": "true",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Blog"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Blog created successfully!"
+            },
+            "409": {
+              "$ref": "#/components/responses/ConflictError"
+            },
+            "422": {
+              "$ref": "#/components/responses/ValidationError"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            }
+          }
+        }
+      },
+      "/blogs/edit/{id}":{
+        "patch": {
+          "tags": ["Blog"],
+          "summary": "Update A Blog",
+          "description": "Update Blog based on Blog id.",
+          "parameters": [
+            {
+              "name": "iD",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "default": "65d1e42fcf8e7ad4a9g38901"
+              },
+              "description": "Blog Id"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Blog Updated successfull!"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            },
+            "409": {
+              "$ref": "#/components/responses/ConflictError"
+            },
+            "422": {
+              "$ref": "#/components/responses/ValidationError"
+            }
+           
+          }
+        }
+      },
+      "/blogs/delete/{Id}": {
+        "delete": {
+          "tags": ["Blog"],
+          "summary": "Delete A Blog",
+          "description": "Delete A Blog based on Blog id.",
+          "parameters": [
+            {
+              "name": "Id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "default": "65d1e42fcf8e7ad4a9g38901"
+              },
+              "description": "Blog Id"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Blog deleted successfull!"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            },
+            "422": {
+              "$ref": "#/components/responses/ValidationError"
+            }
+          }
+        }
+      },
+      "/blogs/{id}/comments":{
+        "get": {
+          "tags": ["Comments"],
+          "summary": "Getting all comments listed on a blog ",
+          "description": "Pass in an ID of the blog to get all comments",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "default": "65d1d9379f46680630b65fd0"
+              },
+              "description": "Comment ID"
+            }
+          ],
+          "requestBody": {
+            "required": "true",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Comments retrived successfuly."
+            },
+            "400": {
+              "$ref": "#/components/responses/BadRequest"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            }
+          }
+        }
+      },
+      "/blogs/{id}/comments/new": {
+        "post": {
+          "tags": ["Comments"],
+          "summary": "Adding a comment on a blog ",
+          "description": "To comment on a blog, provide an ID of the blog you want to comment on",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "default": "65d1d9379f46680630b65fd0"
+              },
+              "description": "Blog Id"
+            }
+          ],
+          "requestBody": {
+            "required": "true",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "User created successfully!"
+            },
+            "409": {
+              "$ref": "#/components/responses/ConflictError"
+            },
+            "422": {
+              "$ref": "#/components/responses/ValidationError"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            }
+          }
+        }
+      },
+      "/blogs/{id}/comments/delete": {
+        "delete": {
+          "tags": ["Comments"],
+          "summary": "Deleting a comment  ",
+          "description": "To delete a comment, pass in the id of the comment",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "default": "65d1d9379f46680630b65fd0"
+              },
+              "description": "Blog Id"
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "User created successfully!"
+            },
+            "409": {
+              "$ref": "#/components/responses/ConflictError"
+            },
+            "422": {
+              "$ref": "#/components/responses/ValidationError"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            }
+          }
+        }
+      },
+      "/blogs/{id}/comments/edit": {
+        "patch": {
+          "tags": ["Comments"],
+          "summary": "Edit a comment on a blog ",
+          "description": "To edit a comment on a blog, provide an ID of the comment you want to edit",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "default": "65d1d9379f46680630b65fd0"
+              },
+              "description": "Comment ID"
+            }
+          ],
+          "requestBody": {
+            "required": "true",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "User created successfully!"
+            },
+            "409": {
+              "$ref": "#/components/responses/ConflictError"
+            },
+            "422": {
+              "$ref": "#/components/responses/ValidationError"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            }
+          }
+        }
+      },
+      "/blogs/{id}/like": {
+        "patch": {
+          "tags": ["Like"],
+          "summary": "Liking a blog ",
+          "description": "To like a blog, you have to pass in the id of the blog you want to like",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "default": "65d1d9379f46680630b65fd0"
+              },
+              "description": "User Id"
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Like added successfully!"
+            },
+            "409": {
+              "$ref": "#/components/responses/ConflictError"
+            },
+            "422": {
+              "$ref": "#/components/responses/ValidationError"
             },
             "500": {
               "$ref": "#/components/responses/ServerError"
