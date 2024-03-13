@@ -6,10 +6,7 @@
       "title": "Capstone Project Backend API"
     },
     "servers": [
-      {
-        "url": "http://localhost:3005/api",
-        "description": "Local server"
-      },
+      
       {
         "url": "https://my-brand-be-ddpa.onrender.com/api",
         "description": "hosted server"
